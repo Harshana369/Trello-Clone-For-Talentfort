@@ -2,6 +2,7 @@ import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import { useSelector } from "react-redux";
+import Sidebar from "./pages/Sidebar";
 
 function Layout() {
   const { user } = useSelector((state) => state.auth);
@@ -10,7 +11,7 @@ function Layout() {
   return user ? (
     <div className="flex flex-col w-full h-screen md:flex-row">
       <div className="sticky top-0 hidden w-1/5 h-screen bg-white md:block">
-        {/* <Sidebar /> */}
+        <Sidebar />
       </div>
 
       {/* <MobileSidebar /> */}
