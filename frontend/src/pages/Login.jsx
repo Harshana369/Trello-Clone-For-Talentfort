@@ -1,13 +1,14 @@
-import { useNavigate } from "react-router-dom";
-import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import Textbox from "../components/Textbox";
-import Button from "../components/Button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Button, Loading, Textbox } from "../components";
+import { useLoginMutation } from "../redux/slices/api/authApiSlice";
+import { setCredentials } from "../redux/slices/authSlice";
+import { useEffect } from "react";
 
 const Login = () => {
   const { user } = useSelector((state) => state.auth);
-
   const {
     register,
     handleSubmit,
@@ -15,14 +16,23 @@ const Login = () => {
   } = useForm();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
+
+  const handleLogin = async (data) => {
+    try {
+      const res = await login(data).unwrap();
+
+      dispatch(setCredentials(res));
+      navigate("/");
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
+  };
 
   useEffect(() => {
     user && navigate("/dashboard");
   }, [user]);
-
-  const submitHandler = async (data) => {
-    console.log("submit");
-  };
 
   return (
     <section className="flex flex-col md:flex-row h-screen items-center">
@@ -38,7 +48,7 @@ const Login = () => {
           <h1 className="text-xl md:text-2xl font-bold leading-tight mt-12">
             Log in to your account
           </h1>
-          <form className="mt-6" onSubmit={handleSubmit(submitHandler)}>
+          <form className="mt-6" onSubmit={handleSubmit(handleLogin)}>
             <div className="flex flex-col gap-y-5">
               <Textbox
                 placeholder="email@example.com"
@@ -70,7 +80,7 @@ const Login = () => {
               <Button
                 type="submit"
                 label="Submit"
-                className="w-full h-10 text-white bg-blue-700 rounded-full"
+                className="w-full h-10 text-white bg-green-700 rounded-full"
               />
             </div>
           </form>

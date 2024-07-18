@@ -1,16 +1,16 @@
-import mysql from "mysql2";
+import jwt from "jsonwebtoken";
 
-export const dbConnection = async () => {
-  try {
-    await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "harshana1945",
-      database: "talentfort_task_tracking",
-    });
+const createJWT = (res, userId) => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: "1d",
+  });
 
-    console.log("DB connection established");
-  } catch (error) {
-    console.log("DB Error: " + error);
-  }
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== "development", // Use secure cookies in production
+    sameSite: "strict", // Prevent CSRF attacks
+    maxAge: 1 * 24 * 60 * 60 * 1000, // 1 days
+  });
 };
+
+export default createJWT;
